@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaël & Hasan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(180deg, #2d1810 0%, #3d2817 50%, #4a3220 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #f5d5b8 0%, #e8c4a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1); }
+        }
+
+        .header {
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .gallery-item {
+            animation: fadeInUp 0.6s ease-out backwards;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-12px) rotate(1deg) scale(1.02);
+        }
+
+        .gallery-item:nth-child(1) { animation-delay: 0.1s; }
+        .gallery-item:nth-child(2) { animation-delay: 0.2s; }
+        .gallery-item:nth-child(3) { animation-delay: 0.3s; }
+        .gallery-item:nth-child(4) { animation-delay: 0.4s; }
+
+        .emoji-bounce {
+            animation: bounce 2s infinite;
+        }
+
+        .heart {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: #f5d5b8;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+            padding: 10px 20px;
+        }
+
+        .close-btn:hover {
+            color: #e8c4a0;
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Masonry Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            grid-auto-rows: 280px;
+        }
+
+        .gallery-item:nth-child(1) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gallery-item:nth-child(4) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 20px;
+                grid-auto-rows: 180px;
+            }
+
+            .gallery-item:nth-child(1),
+            .gallery-item:nth-child(4) {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .header h1 {
+                font-size: 2rem !important;
+            }
+
+            .close-btn {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        .img-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #5c3d2e 0%, #6b4423 100%);
+        }
+
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gallery-item:hover .img-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(45, 24, 16, 0.9), transparent);
+            color: #f5d5b8;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 2px solid #8b5a3c;
+        }
+
+        .section-card {
+            border-left: 4px solid #d4926a;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header py-16 px-4 text-center">
+        <h1 class="gradient-text text-5xl md:text-6xl font-bold mb-4">
+            Jelly is cuti patootie
+        </h1>
+        <p class="text-xl md:text-2xl text-amber-100 font-light">
+            Jelly is cuti patootie
+        </p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 pb-20">
+        <!-- Gallery Grid -->
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openModal(this)">
+                <div class="img-wrapper">
+                    <img src="2026-01-15 11_44_30-Greenshot.png" alt="Moment 1">
+                </div>
+                <div class="card-label">
+                    <span class="emoji-bounce inline-block">🌟</span>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openModal(this)">
+                <div class="img-wrapper">
+                    <img src="2026-01-15 11_45_01-Greenshot.png" alt="Moment 2">
+                </div>
+                <div class="card-label">
+                    <span class="emoji-bounce inline-block">✨</span>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openModal(this)">
+                <div class="img-wrapper">
+                    <img src="2026-01-15 11_45_28-Greenshot.png" alt="Moment 3">
+                </div>
+                <div class="card-label">
+                    <span class="emoji-bounce inline-block">💫</span>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openModal(this)">
+                <div class="img-wrapper">
+                    <img src="2026-01-15 11_45_40-.png" alt="Moment 4">
+                </div>
+                <div class="card-label">
+                    <span class="emoji-bounce inline-block">🎯</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Content for Scrolling -->
+        <div class="mt-32 space-y-20">
+            <!-- Section 1 -->
+            <section class="section-card bg-gradient-to-r from-amber-900 to-orange-900 rounded-lg p-8 md:p-12 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                <div class="max-w-3xl">
+                    <h2 class="text-4xl font-bold text-amber-100 mb-6">Jelly is cuti patootie</h2>
+                    <p class="text-amber-50 text-lg leading-relaxed">
+                        Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="grid md:grid-cols-2 gap-8">
+                <div class="section-card bg-gradient-to-br from-orange-900 to-red-900 rounded-lg p-8 shadow-xl hover:shadow-2xl transition-shadow">
+                    <h3 class="text-2xl font-bold text-amber-100 mb-4">🎨 Jelly is cuti patootie</h3>
+                    <p class="text-amber-50">
+                        Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie
+                    </p>
+                </div>
+                <div class="section-card bg-gradient-to-br from-red-900 to-orange-900 rounded-lg p-8 shadow-xl hover:shadow-2xl transition-shadow">
+                    <h3 class="text-2xl font-bold text-amber-100 mb-4">💕 Jelly is cuti patootie</h3>
+                    <p class="text-amber-50">
+                        Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie Jelly is cuti patootie
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="section-card bg-gradient-to-r from-red-900 to-orange-900 rounded-lg p-8 md:p-12 shadow-2xl">
+                <h2 class="text-3xl font-bold text-amber-100 mb-6">✨ Jelly is cuti patootie</h2>
+                <ul class="space-y-4 text-amber-50">
+                    <li class="flex items-center">
+                        <span class="text-2xl mr-4">👆</span>
+                        <span>Jelly is cuti patootie</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-2xl mr-4">✨</span>
+                        <span>Jelly is cuti patootie</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-2xl mr-4">🎪</span>
+                        <span>Jelly is cuti patootie</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-2xl mr-4">🎊</span>
+                        <span>Jelly is cuti patootie</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-2xl mr-4">⌨️</span>
+                        <span>Jelly is cuti patootie</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-2xl mr-4">📱</span>
+                        <span>Jelly is cuti patootie</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Footer Section -->
+            <section class="text-center py-16">
+                <p class="text-3xl text-amber-100 font-light mb-4">
+                    Jelly is cuti patootie <span class="heart">💕</span> Jelly is cuti patootie
+                </p>
+                <p class="text-amber-200 text-lg">
+                    Jelly is cuti patootie
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <img id="modalImage" src="" alt="Full view" style="max-width: 95vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(245, 213, 184, 0.3);">
+        </div>
+    </div>
+
+    <script>
+        function openModal(card) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImage');
+            const img = card.querySelector('img');
+            
+            modal.classList.add('active');
+            modalImg.src = img.src;
+            document.body.style.overflow = 'hidden';
+            
+            createConfetti();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Click outside modal to close
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Add mouse move particle effect
+        let lastParticleTime = 0;
+        document.addEventListener('mousemove', function(e) {
+            const now = Date.now();
+            if (now - lastParticleTime > 50) {
+                createParticle(e.clientX, e.clientY);
+                lastParticleTime = now;
+            }
+        });
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.width = '8px';
+            particle.style.height = '8px';
+            particle.style.backgroundColor = getRandomWarmColor();
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '100';
+            particle.style.opacity = '0.6';
+            
+            document.body.appendChild(particle);
+            
+            let left = x;
+            let top = y;
+            let vx = (Math.random() - 0.5) * 3;
+            let vy = (Math.random() - 0.5) * 3 - 1;
+            let life = 25;
+            
+            const animate = () => {
+                life--;
+                left += vx;
+                top += vy;
+                vy += 0.08;
+                particle.style.left = left + 'px';
+                particle.style.top = top + 'px';
+                particle.style.opacity = (life / 25) * 0.6;
+                
+                if (life > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    particle.remove();
+                }
+            };
+            animate();
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 40; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.top = '-20px';
+                confetti.style.width = '12px';
+                confetti.style.height = '12px';
+                confetti.style.backgroundColor = getRandomWarmColor();
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '999';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                
+                document.body.appendChild(confetti);
+                
+                let left = parseFloat(confetti.style.left);
+                let top = 0;
+                let rotation = Math.random() * 360;
+                const duration = 2500 + Math.random() * 1000;
+                const startTime = Date.now();
+                
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = elapsed / duration;
+                    
+                    top = progress * (window.innerHeight + 40);
+                    left += (Math.random() - 0.5) * 2;
+                    rotation += Math.random() * 12;
+                    
+                    confetti.style.top = top + 'px';
+                    confetti.style.left = left + 'px';
+                    confetti.style.transform = 'rotate(' + rotation + 'deg)';
+                    confetti.style.opacity = Math.max(0, 1 - progress);
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        confetti.remove();
+                    }
+                };
+                animate();
+            }
+        }
+
+        function getRandomWarmColor() {
+            const colors = ['#f5d5b8', '#e8c4a0', '#d4a574', '#c9945a', '#b8860b', '#ff8c42', '#ff6b35'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+</body>
+</html>
